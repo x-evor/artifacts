@@ -1,0 +1,25 @@
+service:
+  nameOverride: rag-server
+  containerPort: 8080
+  service:
+    port: 80
+  global:
+    existingSecretName: rag-server-env
+    repository: ghcr.io/x-evor/rag-server
+    tag: latest
+    env:
+      PORT: "8080"
+      SERVICE_NAME: rag-server
+      HEALTHCHECK_PATH: /healthz
+  readinessProbe:
+    httpGet:
+      path: /healthz
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 20

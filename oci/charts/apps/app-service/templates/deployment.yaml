@@ -1,3 +1,22 @@
+{{- $global := .Values.global | default dict -}}
+{{- $globalRepository := $global.repository | default "" -}}
+{{- $globalTag := $global.tag | default "" -}}
+{{- $globalEnv := $global.env | default dict -}}
+{{- $localEnv := .Values.env | default dict -}}
+{{- $env := mergeOverwrite (deepCopy $globalEnv) $localEnv -}}
+{{- $existingSecretName := .Values.existingSecretName | default ($global.existingSecretName | default "") -}}
+{{- $imageRepository := default $globalRepository .Values.image.repository -}}
+{{- $imageTag := default $globalTag .Values.image.tag -}}
+{{- $globalEnvFromSecretRefs := $global.envFromSecretRefs | default list -}}
+{{- $localEnvFromSecretRefs := .Values.envFromSecretRefs | default list -}}
+{{- $envFromSecretRefs := concat $globalEnvFromSecretRefs $localEnvFromSecretRefs -}}
+{{- $globalExternalServices := index $global "external-service" | default list -}}
+{{- $localExternalServices := index .Values "external-service" | default list -}}
+{{- $externalServices := concat $globalExternalServices $localExternalServices -}}
+{{- if $externalServices -}}
+{{- $_ := set $env "EXTERNAL_SERVICES" (join "," $externalServices) -}}
+{{- end -}}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,8 +43,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
-        {{- if and .Values.reloader.enabled .Values.existingSecretName }}
-        secret.reloader.stakater.com/reload: {{ default .Values.existingSecretName .Values.reloader.secretMatch | quote }}
+        {{- if and .Values.reloader.enabled $existingSecretName }}
+        secret.reloader.stakater.com/reload: {{ default $existingSecretName .Values.reloader.secretMatch | quote }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
@@ -50,30 +69,49 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: app
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ $imageRepository }}:{{ $imageTag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.workingDir }}
+          workingDir: {{ .Values.workingDir | quote }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.containerPort }}
-          {{- if .Values.env }}
+          {{- if $env }}
           env:
-            {{- range $key, $value := .Values.env }}
+            {{- range $key := keys $env | sortAlpha }}
             - name: {{ $key }}
-              value: {{ $value | quote }}
+              value: {{ index $env $key | quote }}
             {{- end }}
           {{- end }}
-          {{- if or .Values.existingSecretName .Values.envFromSecretRefs }}
+          {{- if or $existingSecretName $envFromSecretRefs }}
           envFrom:
-            {{- if .Values.existingSecretName }}
+            {{- if $existingSecretName }}
             - secretRef:
-                name: {{ .Values.existingSecretName }}
+                name: {{ $existingSecretName }}
             {{- end }}
-            {{- range .Values.envFromSecretRefs }}
+            {{- range $envFromSecretRefs }}
             - secretRef:
                 name: {{ . }}
             {{- end }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -81,3 +119,10 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
+        {{- with .Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
