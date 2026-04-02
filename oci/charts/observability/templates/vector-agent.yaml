@@ -38,6 +38,10 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/vector
+            {{- if .Values.agent.vector.volume.enabled }}
+            - name: {{ .Values.agent.vector.volume.name }}
+              mountPath: {{ .Values.agent.vector.volume.mountPath }}
+            {{- end }}
             - name: var-log
               mountPath: /var/log
               readOnly: true
@@ -48,6 +52,13 @@ spec:
         - name: config
           configMap:
             name: vector-agent-config
+        {{- if .Values.agent.vector.volume.enabled }}
+        - name: {{ .Values.agent.vector.volume.name }}
+          emptyDir:
+            {{- if .Values.agent.vector.volume.sizeLimit }}
+            sizeLimit: {{ .Values.agent.vector.volume.sizeLimit }}
+            {{- end }}
+        {{- end }}
         - name: var-log
           hostPath:
             path: /var/log
