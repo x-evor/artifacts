@@ -1,0 +1,26 @@
+{{- if .Values.components.vault.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: {{ .Values.components.vault.releaseName }}
+  namespace: {{ .Values.namespaces.vault }}
+spec:
+  interval: 10m0s
+  releaseName: {{ .Values.components.vault.releaseName }}
+  chart:
+    spec:
+      chart: {{ .Values.components.vault.chart.name }}
+      version: {{ .Values.components.vault.chart.version | quote }}
+      sourceRef:
+        kind: {{ .Values.components.vault.sourceRef.kind }}
+        name: {{ .Values.components.vault.sourceRef.name }}
+        namespace: {{ .Values.components.vault.sourceRef.namespace }}
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    {{- toYaml .Values.components.vault.values | nindent 4 }}
+{{- end }}

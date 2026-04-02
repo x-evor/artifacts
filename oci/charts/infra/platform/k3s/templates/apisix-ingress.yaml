@@ -1,0 +1,30 @@
+{{- if .Values.apisixIngress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.apisixIngress.name }}
+  namespace: {{ .Values.apisixIngress.namespace }}
+  {{- with .Values.apisixIngress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.apisixIngress.className }}
+  tls:
+    - hosts:
+        {{- toYaml .Values.apisixIngress.tls.hosts | nindent 8 }}
+      secretName: {{ .Values.apisixIngress.tls.secretName }}
+  rules:
+    {{- range .Values.apisixIngress.hosts }}
+    - host: {{ .host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .serviceName }}
+                port:
+                  number: {{ .servicePort }}
+    {{- end }}
+{{- end }}

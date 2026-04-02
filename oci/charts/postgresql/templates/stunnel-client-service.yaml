@@ -1,0 +1,23 @@
+{{- if .Values.stunnelClient.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "postgresql.fullname" . }}-stunnel-client
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+  {{- with .Values.stunnelClient.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.stunnelClient.service.type }}
+  ports:
+    - name: postgres
+      port: {{ .Values.stunnelClient.service.port }}
+      targetPort: postgres
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: {{ include "postgresql.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: stunnel-client
+{{- end }}
