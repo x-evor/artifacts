@@ -21,6 +21,24 @@ spec:
   upgrade:
     remediation:
       retries: 3
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: {{ .Values.components.apisix.releaseName }}
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/command
+                value:
+                  - sh
+                  - -c
+                  - |
+                    export APISIX_STAND_ALONE=true
+                    ln -sf /apisix-config/apisix.yaml /usr/local/apisix/conf/apisix.yaml
+                    exec /docker-entrypoint.sh docker-start
   values:
     {{- toYaml .Values.components.apisix.values | nindent 4 }}
 {{- end }}
