@@ -1,6 +1,6 @@
 # OCI Charts
 
-This repository stores reusable Helm charts published to `ghcr.io/x-evor/charts`.
+This repository stores reusable Helm charts published to `ghcr.io/x-evor`.
 
 ## Layout
 
@@ -11,6 +11,6 @@ This repository stores reusable Helm charts published to `ghcr.io/x-evor/charts`
 
 ## Release Model
 
-- Registry: `oci://ghcr.io/x-evor/charts`
+- Registry: `oci://ghcr.io/x-evor`
 - Each chart is versioned independently
 - Runtime image tags are managed by GitOps values rather than chart versions
