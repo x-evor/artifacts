@@ -128,21 +128,21 @@ components:
             namespace: platform
   sharedTlsSecretSync:
     enabled: true
-    name: postgresql-vultr-tls-sync
+    name: postgresql-tls-sync
     sourceNamespace: platform
-    sourceSecretName: postgresql-vultr-tls
+    sourceSecretName: postgresql-tls
     targetNamespace: database
-    targetSecretName: postgresql-vultr-tls
+    targetSecretName: postgresql-tls
     refreshSchedule: "*/5 * * * *"
   postgresqlTlsIngress:
     enabled: true
-    name: postgresql-vultr-tls
+    name: postgresql-tls
     namespace: platform
     className: caddy
-    serviceName: postgresql-vultr-tls-placeholder
+    serviceName: postgresql-tls-placeholder
     servicePort: 80
     host: postgresql-vultr.svc.plus
-    secretName: postgresql-vultr-tls
+    secretName: postgresql-tls
   vault:
     enabled: false
     releaseName: vault
