@@ -22,3 +22,6 @@
 .build-harness
 build-harness
 dist/bin/*
+
+# Packaged Helm charts generated in-place during release work
+oci/charts/apps/*/charts/*.tgz
