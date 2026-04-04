@@ -141,7 +141,7 @@ components:
     className: caddy
     serviceName: postgresql-tls-placeholder
     servicePort: 80
-    host: postgresql-tls.svc.plus
+    host: "postgresql-<node-or-cluster>.svc.plus"
     secretName: postgresql-tls
   vault:
     enabled: false
