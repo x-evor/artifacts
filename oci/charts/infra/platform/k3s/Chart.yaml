@@ -2,5 +2,5 @@ apiVersion: v2
 name: k3s-platform-chart
 description: Composes Flux-managed platform components for the k3s platform
 type: application
-version: 0.1.7
+version: 0.1.8
 appVersion: "1.0.0"
