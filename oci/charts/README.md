@@ -5,7 +5,6 @@ This repository stores reusable Helm charts published to `ghcr.io/x-evor`.
 ## Layout
 
 - `apps/app-service`: reusable runtime chart for application services
-- `infra/platform/k3s`: platform composition chart for `caddy`, `apisix`, `external-dns`, `external-secrets`, and `vault`
 - `postgresql`: PostgreSQL service chart with optional `stunnel` server/client
 - `observability`: observability composition chart for server and agent components
 

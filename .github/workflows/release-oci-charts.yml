@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - "oci/charts/apps/app-service/**"
-      - "oci/charts/infra/platform/k3s/**"
       - "oci/charts/postgresql/**"
       - "oci/charts/observability/**"
       - ".github/workflows/release-oci-charts.yml"
@@ -40,7 +39,6 @@ jobs:
           set -euo pipefail
           charts=(
             "oci/charts/apps/app-service"
-            "oci/charts/infra/platform/k3s"
             "oci/charts/postgresql"
             "oci/charts/observability"
           )
@@ -54,7 +52,6 @@ jobs:
           mkdir -p dist
           charts=(
             "oci/charts/apps/app-service"
-            "oci/charts/infra/platform/k3s"
             "oci/charts/postgresql"
             "oci/charts/observability"
           )
